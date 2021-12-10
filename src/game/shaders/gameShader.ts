@@ -6,7 +6,7 @@ export class GameShader extends ShaderProgram {
 
     public texture: WebGLUniformLocation;
     public resolution: WebGLUniformLocation;
-    public offset: WebGLUniformLocation;
+    public displayMode: WebGLUniformLocation;
 
     public constructor(gl: WebGLRenderingContext) {
         super(
@@ -23,7 +23,7 @@ export class GameShader extends ShaderProgram {
     protected getAllUniformLocations(): void {
         this.texture = this.getUniformLocation("texture");
         this.resolution = this.getUniformLocation("resolution");
-        this.offset = this.getUniformLocation("offset");
+        this.displayMode = this.getUniformLocation("displayMode");
     }
 
     public loadResolution(): void {
@@ -33,8 +33,8 @@ export class GameShader extends ShaderProgram {
         );
     }
 
-    public loadOffset(offset: Vector): void {
-        this.load2DVector(this.offset, offset);
+    public loadDisplayMode(mode: boolean): void {
+        this.loadBoolean(this.displayMode, mode);
     }
 
     public loadTextures(): void {

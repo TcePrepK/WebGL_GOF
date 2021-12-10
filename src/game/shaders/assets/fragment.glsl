@@ -2,11 +2,16 @@ precision highp float;
 
 uniform sampler2D texture;
 uniform vec2 resolution;
-uniform vec2 offset;
+uniform bool displayMode;
 
-const vec2 down = vec2(0.0, 1.0);
+void display() {
+    vec2 uv = gl_FragCoord.xy / resolution.xy;
+    uv.y = 1.0 - uv.y;
 
-void main() {
+    gl_FragColor = texture2D(texture, uv);
+}
+
+void step() {
     vec2 pos = gl_FragCoord.xy;
     
     bool alive = (texture2D(texture, pos / resolution).rgb == vec3(1.0));
@@ -37,4 +42,12 @@ void main() {
     }
 
     gl_FragColor = vec4(alive);
+}
+
+void main() {
+    if (displayMode) {
+        display();
+    } else {
+        step();
+    }
 }

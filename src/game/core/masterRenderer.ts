@@ -1,12 +1,10 @@
-import { DisplayShader } from "../shaders/displayShader";
 import { GameShader } from "../shaders/gameShader";
 import { globalVariables } from "./globalVariables";
-import { Vector } from "./vector";
 
 export class MasterRenderer {
     private gl: WebGLRenderingContext;
 
-    private displayShader: DisplayShader;
+    // private displayShader: DisplayShader;
     private gameShader: GameShader;
 
     private displayBuffer: WebGLBuffer;
@@ -14,15 +12,13 @@ export class MasterRenderer {
 
     private oldColorAttachment: WebGLTexture;
 
-    private offset: Vector = new Vector(0, 0);
-
     public WIDTH: number = globalVariables.width;
     public HEIGHT: number = globalVariables.height;
 
     public constructor(gl: WebGLRenderingContext) {
         this.gl = gl;
 
-        this.displayShader = new DisplayShader(gl);
+        // this.displayShader = new DisplayShader(gl);
         this.gameShader = new GameShader(gl);
 
         this.displayBuffer = this.createDisplayBuffer();
@@ -37,11 +33,6 @@ export class MasterRenderer {
         this.gameShader.loadResolution();
         this.gameShader.loadTextures();
         this.gameShader.stop();
-
-        this.displayShader.start();
-        this.displayShader.loadResolution();
-        this.displayShader.loadTextures();
-        this.displayShader.stop();
 
         window.addEventListener(
             "mousedown",
@@ -82,14 +73,23 @@ export class MasterRenderer {
         const gl = this.gl;
         this.prepare();
 
-        this.bindFrameBuffer();
+        // Display
+        this.gameShader.start();
 
+        this.gameShader.loadDisplayMode(true);
+        gl.bindTexture(gl.TEXTURE_2D, this.oldColorAttachment);
+        this.drawDisplay(this.gameShader.position);
+
+        this.gameShader.stop();
+        // Display
+
+        this.bindFrameBuffer();
         const colorBuffer = this.createColorBuffer();
 
         // Game
         this.gameShader.start();
 
-        this.gameShader.loadOffset(this.offset);
+        this.gameShader.loadDisplayMode(false);
         gl.bindTexture(gl.TEXTURE_2D, this.oldColorAttachment);
         this.drawDisplay(this.gameShader.position);
 
@@ -97,15 +97,6 @@ export class MasterRenderer {
         // Game
 
         this.unbindFrameBuffer();
-
-        // Display
-        this.displayShader.start();
-
-        gl.bindTexture(gl.TEXTURE_2D, colorBuffer);
-        this.drawDisplay(this.displayShader.position);
-
-        this.displayShader.stop();
-        // Display
 
         gl.deleteTexture(this.oldColorAttachment);
         this.oldColorAttachment = colorBuffer;

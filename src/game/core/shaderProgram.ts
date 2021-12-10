@@ -54,6 +54,13 @@ export abstract class ShaderProgram {
         this.gl.uniform1i(location, value);
     }
 
+    protected loadBoolean(
+        location: WebGLUniformLocation,
+        value: boolean
+    ): void {
+        this.gl.uniform1i(location, value ? 1 : 0);
+    }
+
     protected load2DVector(
         location: WebGLUniformLocation,
         vector: Vector
