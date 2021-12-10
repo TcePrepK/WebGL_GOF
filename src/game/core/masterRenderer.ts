@@ -51,6 +51,8 @@ export class MasterRenderer {
             pixels[i] = r < 0.5 ? 0 : 255;
         }
 
+        this.gameShader.iterNum = 1;
+
         return pixels;
     }
 
@@ -90,6 +92,7 @@ export class MasterRenderer {
         this.gameShader.start();
 
         this.gameShader.loadDisplayMode(false);
+        this.gameShader.loadIter();
         gl.bindTexture(gl.TEXTURE_2D, this.oldColorAttachment);
         this.drawDisplay(this.gameShader.position);
 

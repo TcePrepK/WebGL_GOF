@@ -7,6 +7,9 @@ export class GameShader extends ShaderProgram {
     public texture: WebGLUniformLocation;
     public resolution: WebGLUniformLocation;
     public displayMode: WebGLUniformLocation;
+    public iter: WebGLUniformLocation;
+
+    public iterNum: number;
 
     public constructor(gl: WebGLRenderingContext) {
         super(
@@ -14,6 +17,8 @@ export class GameShader extends ShaderProgram {
             "src/game/shaders/assets/vertex.glsl",
             "src/game/shaders/assets/fragment.glsl"
         );
+
+        this.iterNum = 1;
     }
 
     protected getAllAttributeLocations(): void {
@@ -24,6 +29,11 @@ export class GameShader extends ShaderProgram {
         this.texture = this.getUniformLocation("texture");
         this.resolution = this.getUniformLocation("resolution");
         this.displayMode = this.getUniformLocation("displayMode");
+        this.iter = this.getUniformLocation("iter");
+    }
+
+    public loadIter(): void {
+        this.loadFloat(this.iter, this.iterNum++);
     }
 
     public loadResolution(): void {

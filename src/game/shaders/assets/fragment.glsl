@@ -3,6 +3,7 @@ precision highp float;
 uniform sampler2D texture;
 uniform vec2 resolution;
 uniform bool displayMode;
+uniform float iter;
 
 void display() {
     vec2 uv = gl_FragCoord.xy / resolution.xy;
@@ -12,36 +13,33 @@ void display() {
 }
 
 void step() {
-    vec2 pos = gl_FragCoord.xy;
-    
-    bool alive = (texture2D(texture, pos / resolution).rgb == vec3(1.0));
+    float width = resolution.x / 2.0;
+    float height = resolution.y / 2.0;
 
-    // loop around 8 sides of current position
-    int aliveNeighbor = 0;
-    for (int i = -1; i < 2; i++) {
-        for (int j = -1; j < 2; j++) {
-            if (i == 0 && j == 0) continue;
+    vec2 pos = gl_FragCoord.xy - vec2(width, height);
+    vec2 vel = normalize(pos);
 
-            vec2 neighbor = pos + vec2(i, j);
-            vec3 neighborColor = texture2D(texture, neighbor / resolution).rgb;
+    for (float i = 0.0; i < 1000000.0; i++) {
+        if (i == iter) {
+            break;
+        }
 
-            if (neighborColor == vec3(1.0)) {
-                aliveNeighbor++;
-            }
+        pos += vel;
+        
+        if (pos.x > width || pos.x < -width) {
+            pos -= vel;
+            vel.x = -vel.x;
+            pos += vel;
+        }
+
+        if (pos.y > height || pos.y < -height) {
+            pos -= vel;
+            vel.y = -vel.y;
+            pos += vel;
         }
     }
 
-    if (alive) {
-        if (aliveNeighbor == 3 || aliveNeighbor == 2) {
-            alive = true;
-        } else {
-            alive = false;
-        }
-    } else if (aliveNeighbor == 3) {
-        alive = true;
-    }
-
-    gl_FragColor = vec4(alive);
+    gl_FragColor = vec4(abs(pos) / vec2(width, height), 0.0, 1.0);
 }
 
 void main() {
